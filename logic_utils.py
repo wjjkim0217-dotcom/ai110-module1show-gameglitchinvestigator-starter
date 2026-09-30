@@ -1,3 +1,6 @@
+# Bug fixes in this file were made with the help of an AI agent (Claude Code).
+# Comments tagged FIX mark where a bug was found and fixed.
+
 def get_range_for_difficulty(difficulty: str):
     """Return (low, high) inclusive range for a given difficulty."""
     if difficulty == "Easy":
@@ -38,9 +41,11 @@ def check_guess(guess, secret):
 
     outcome examples: "Win", "Too High", "Too Low"
     """
+    # FIX: removed the str-comparison fallback ("9" > "50"); both args must be ints.
     if guess == secret:
         return "Win", "🎉 Correct!"
 
+    # FIX: hints were swapped; a too-high guess now says "Go LOWER!".
     if guess > secret:
         return "Too High", "📉 Go LOWER!"
     return "Too Low", "📈 Go HIGHER!"
@@ -53,11 +58,13 @@ def update_score(current_score: int, outcome: str, attempt_number: int):
     attempt_number is 1-based: the guess just made counts as attempt 1, 2, ...
     """
     if outcome == "Win":
+        # FIX: attempt_number is already 1-based; the old "+ 1" made a first-try win score 70.
         points = 100 - 10 * attempt_number
         if points < 10:
             points = 10
         return current_score + points
 
+    # FIX: wrong guesses always cost 5 (Too High used to be +5/-5 by attempt parity).
     if outcome in ("Too High", "Too Low"):
         return current_score - 5
 

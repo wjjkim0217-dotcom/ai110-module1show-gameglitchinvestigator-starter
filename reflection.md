@@ -26,6 +26,14 @@ Document at least 3 bugs you found. Add rows as needed.
 - Give one example of an AI suggestion that was correct (including what the AI suggested and how you verified the result).
 - Give one example of an AI suggestion you did not accept as written (including what the AI suggested, why you rejected or changed it, and how you verified your version). It does not have to be a suggestion that was wrong: over-engineered, out of scope, harder to read, or a poor fit for this codebase all count.
 
+I utilized Claude Code on Sonnet 5.5 Medium.
+
+I utilized Claude Code to help me find the areas of code that had bugs or mistakes and I was able to see why the code was wrong and Claude gave good suggestions to fix the code.
+I verified most of the bugs by going in and manually testing. 
+
+With this particular AI model, I did not reject any suggestions offered. 
+
+
 ---
 
 ## 3. Debugging and testing your fixes
@@ -34,6 +42,10 @@ Document at least 3 bugs you found. Add rows as needed.
 - Describe at least one test you ran (manual or using pytest)  
   and what it showed you about your code.
 - Did AI help you design or understand any tests? How?
+
+I decided that a bug was really fixed by manually verifying. One of the main bugs that I fixed was whether the game was offering the correct hint, depending on the inputted value and the secret. 
+
+I had AI help explain the tests generated which were mostly used to verify the bugs we had fixed and it also generated a few additional tests that were used for general coverage. 
 
 ---
 

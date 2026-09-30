@@ -40,17 +40,12 @@ def check_guess(guess, secret):
 
 def update_score(current_score: int, outcome: str, attempt_number: int):
     if outcome == "Win":
-        points = 100 - 10 * (attempt_number + 1)
+        points = 100 - 10 * attempt_number
         if points < 10:
             points = 10
         return current_score + points
 
-    if outcome == "Too High":
-        if attempt_number % 2 == 0:
-            return current_score + 5
-        return current_score - 5
-
-    if outcome == "Too Low":
+    if outcome in ("Too High", "Too Low"):
         return current_score - 5
 
     return current_score
@@ -84,7 +79,7 @@ if "secret" not in st.session_state:
     st.session_state.secret = random.randint(low, high)
 
 if "attempts" not in st.session_state:
-    st.session_state.attempts = 1
+    st.session_state.attempts = 0
 
 if "score" not in st.session_state:
     st.session_state.score = 0
@@ -100,7 +95,7 @@ if "game_id" not in st.session_state:
 
 
 def start_new_game(low, high):
-    st.session_state.attempts = 1
+    st.session_state.attempts = 0
     st.session_state.secret = random.randint(low, high)
     st.session_state.score = 0
     st.session_state.status = "playing"
@@ -131,20 +126,15 @@ with col2:
 if st.session_state.pop("just_started", False):
     st.success("New game started.")
 
-if st.session_state.status != "playing":
-    if st.session_state.status == "won":
-        st.success("You already won. Start a new game to play again.")
-    else:
-        st.error("Game over. Start a new game to try again.")
-elif submit:
-    st.session_state.attempts += 1
-
+if st.session_state.status == "playing" and submit:
     ok, guess_int, err = parse_guess(raw_guess)
 
     if not ok:
+        # Invalid input doesn't use up an attempt.
         st.session_state.history.append(raw_guess)
         st.error(err)
     else:
+        st.session_state.attempts += 1
         st.session_state.history.append(guess_int)
 
         outcome, message = check_guess(guess_int, st.session_state.secret)
@@ -161,18 +151,21 @@ elif submit:
         if outcome == "Win":
             st.balloons()
             st.session_state.status = "won"
-            st.success(
-                f"You won! The secret was {st.session_state.secret}. "
-                f"Final score: {st.session_state.score}"
-            )
-        else:
-            if st.session_state.attempts >= attempt_limit:
-                st.session_state.status = "lost"
-                st.error(
-                    f"Out of attempts! "
-                    f"The secret was {st.session_state.secret}. "
-                    f"Score: {st.session_state.score}"
-                )
+        elif st.session_state.attempts >= attempt_limit:
+            st.session_state.status = "lost"
+
+# Drawn on every run so the result stays visible until New Game is clicked.
+if st.session_state.status == "won":
+    st.success(
+        f"You won! The secret was {st.session_state.secret}. "
+        f"Final score: {st.session_state.score}. Start a new game to play again."
+    )
+elif st.session_state.status == "lost":
+    st.error(
+        f"Out of attempts! "
+        f"The secret was {st.session_state.secret}. "
+        f"Score: {st.session_state.score}. Start a new game to try again."
+    )
 
 with info_box:
     st.info(
